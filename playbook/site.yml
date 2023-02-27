@@ -49,9 +49,9 @@
     - name: restart vector service
       become: true
       ansible.builtin.systemd:
-          name: vector
-          state: restarted
-          daemon_reload: true
+        name: vector
+        state: restarted
+        daemon_reload: true
 
   tasks:
     - name: Vector Install package
