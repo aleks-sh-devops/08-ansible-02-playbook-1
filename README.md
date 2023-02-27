@@ -123,6 +123,12 @@ vector-01                  : ok=4    changed=3    unreachable=0    failed=0    s
 ```
 
 5. Запустите `ansible-lint site.yml` и исправьте ошибки, если они есть.
+Были лишние пробелы (исправлено):
+```
+yaml: wrong indentation: expected 8 but found 10 (indentation)
+site.yml:52
+```
+
 6. Попробуйте запустить playbook на этом окружении с флагом `--check`.
 7. Запустите playbook на `prod.yml` окружении с флагом `--diff`. Убедитесь, что изменения на системе произведены.
 8. Повторно запустите playbook с флагом `--diff` и убедитесь, что playbook идемпотентен.
