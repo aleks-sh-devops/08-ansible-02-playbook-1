@@ -61,6 +61,18 @@
         state: present
       notify: restart vector service
 
+    - name: Configure Vector | ensure what directory exists
+      file:
+        path: "{{ vector_config_dir }}"
+        state: directory
+        mode: 0644
+
+    - name: Configure Vector | Template config
+      ansible.builtin.template:
+        src: /root/08-ansible-02-playbook-1/playbook/templates/vector.yml.j2
+        mode: 0644
+        dest: "{{ vector_config_dir }}/vector.yml"
+
     - name: Configure Service | Template systemd unit
       become: true
       ansible.builtin.template:
