@@ -132,5 +132,89 @@ site.yml:52
 6. Попробуйте запустить playbook на этом окружении с флагом `--check`.
 7. Запустите playbook на `prod.yml` окружении с флагом `--diff`. Убедитесь, что изменения на системе произведены.
 8. Повторно запустите playbook с флагом `--diff` и убедитесь, что playbook идемпотентен.
+```
+
+root@ansible-test:~/08-ansible-02-playbook-1/playbook# ansible-playbook -i inventory/prod.yml site.yml -vv --diff
+ansible-playbook 2.10.8
+  config file = None
+  configured module search path = ['/root/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python3/dist-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 3.10.6 (main, Nov 14 2022, 16:10:14) [GCC 11.3.0]
+No config file found; using defaults
+Skipping callback 'default', as we already have a stdout callback.
+Skipping callback 'minimal', as we already have a stdout callback.
+Skipping callback 'oneline', as we already have a stdout callback.
+
+PLAYBOOK: site.yml **************************************************************************************************************************************************************************************************************************
+2 plays in site.yml
+
+PLAY [Install Clickhouse] *******************************************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] **********************************************************************************************************************************************************************************************************************
+task path: /root/08-ansible-02-playbook-1/playbook/site.yml:2
+ok: [clickhouse-01]
+META: ran handlers
+
+TASK [Get clickhouse distrib] ***************************************************************************************************************************************************************************************************************
+task path: /root/08-ansible-02-playbook-1/playbook/site.yml:14
+ok: [clickhouse-01] => (item=clickhouse-client) => {"ansible_loop_var": "item", "changed": false, "dest": "./clickhouse-client-22.3.3.44.rpm", "elapsed": 0, "gid": 0, "group": "root", "item": "clickhouse-client", "mode": "0644", "msg": "HTTP Error 304: Not Modified", "owner": "root", "secontext": "unconfined_u:object_r:admin_home_t:s0", "size": 38090, "state": "file", "status_code": 304, "uid": 0, "url": "https://packages.clickhouse.com/rpm/stable/clickhouse-client-22.3.3.44.noarch.rpm"}
+ok: [clickhouse-01] => (item=clickhouse-server) => {"ansible_loop_var": "item", "changed": false, "dest": "./clickhouse-server-22.3.3.44.rpm", "elapsed": 0, "gid": 0, "group": "root", "item": "clickhouse-server", "mode": "0644", "msg": "HTTP Error 304: Not Modified", "owner": "root", "secontext": "unconfined_u:object_r:admin_home_t:s0", "size": 61151, "state": "file", "status_code": 304, "uid": 0, "url": "https://packages.clickhouse.com/rpm/stable/clickhouse-server-22.3.3.44.noarch.rpm"}
+failed: [clickhouse-01] (item=clickhouse-common-static) => {"ansible_loop_var": "item", "changed": false, "dest": "./clickhouse-common-static-22.3.3.44.rpm", "elapsed": 0, "gid": 0, "group": "root", "item": "clickhouse-common-static", "mode": "0644", "msg": "Request failed", "owner": "root", "response": "HTTP Error 404: Not Found", "secontext": "unconfined_u:object_r:admin_home_t:s0", "size": 246310036, "state": "file", "status_code": 404, "uid": 0, "url": "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-22.3.3.44.noarch.rpm"}
+
+TASK [Get clickhouse distrib] ***************************************************************************************************************************************************************************************************************
+task path: /root/08-ansible-02-playbook-1/playbook/site.yml:20
+ok: [clickhouse-01] => {"changed": false, "dest": "./clickhouse-common-static-22.3.3.44.rpm", "elapsed": 0, "gid": 0, "group": "root", "mode": "0644", "msg": "HTTP Error 304: Not Modified", "owner": "root", "secontext": "unconfined_u:object_r:admin_home_t:s0", "size": 246310036, "state": "file", "status_code": 304, "uid": 0, "url": "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-22.3.3.44.x86_64.rpm"}
+
+TASK [Install clickhouse packages] **********************************************************************************************************************************************************************************************************
+task path: /root/08-ansible-02-playbook-1/playbook/site.yml:24
+ok: [clickhouse-01] => {"changed": false, "msg": "", "rc": 0, "results": ["clickhouse-common-static-22.3.3.44-1.x86_64 providing clickhouse-common-static-22.3.3.44.rpm is already installed", "clickhouse-client-22.3.3.44-1.noarch providing clickhouse-client-22.3.3.44.rpm is already installed", "clickhouse-server-22.3.3.44-1.noarch providing clickhouse-server-22.3.3.44.rpm is already installed"]}
+META: ran handlers
+
+TASK [wait 10 sec] **************************************************************************************************************************************************************************************************************************
+task path: /root/08-ansible-02-playbook-1/playbook/site.yml:36
+Pausing for 10 seconds
+(ctrl+C then 'C' = continue early, ctrl+C then 'A' = abort)
+ok: [clickhouse-01] => {"changed": false, "delta": 10, "echo": true, "rc": 0, "start": "2023-02-27 10:47:28.291191", "stderr": "", "stdout": "Paused for 10.0 seconds", "stop": "2023-02-27 10:47:38.292207", "user_input": ""}
+
+TASK [Create database] **********************************************************************************************************************************************************************************************************************
+task path: /root/08-ansible-02-playbook-1/playbook/site.yml:40
+ok: [clickhouse-01] => {"changed": false, "cmd": ["clickhouse-client", "-q", "create database logs;"], "delta": "0:00:00.159782", "end": "2023-02-27 09:06:58.273875", "failed_when_result": false, "msg": "non-zero return code", "rc": 82, "start": "2023-02-27 09:06:58.114093", "stderr": "Received exception from server (version 22.3.3):\nCode: 82. DB::Exception: Received from localhost:9000. DB::Exception: Database logs already exists.. (DATABASE_ALREADY_EXISTS)\n(query: create database logs;)", "stderr_lines": ["Received exception from server (version 22.3.3):", "Code: 82. DB::Exception: Received from localhost:9000. DB::Exception: Database logs already exists.. (DATABASE_ALREADY_EXISTS)", "(query: create database logs;)"], "stdout": "", "stdout_lines": []}
+META: ran handlers
+META: ran handlers
+
+PLAY [Install Vector] ***********************************************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] **********************************************************************************************************************************************************************************************************************
+task path: /root/08-ansible-02-playbook-1/playbook/site.yml:46
+ok: [vector-01]
+META: ran handlers
+
+TASK [Vector Install package] ***************************************************************************************************************************************************************************************************************
+task path: /root/08-ansible-02-playbook-1/playbook/site.yml:57
+ok: [vector-01] => {"changed": false, "msg": "", "rc": 0, "results": ["vector-0.21.1-1.x86_64 providing /root/.ansible/tmp/ansible-tmp-1677494861.5802689-29712-234394909484202/vector-0.21.1-1.x86_64u68Zcs.rpm is already installed"]}
+
+TASK [Configure Vector | ensure what directory exists] **************************************************************************************************************************************************************************************
+task path: /root/08-ansible-02-playbook-1/playbook/site.yml:64
+ok: [vector-01] => {"changed": false, "gid": 0, "group": "root", "mode": "0644", "owner": "root", "path": "/root/vector_config/", "secontext": "unconfined_u:object_r:admin_home_t:s0", "size": 24, "state": "directory", "uid": 0}
+
+TASK [Configure Vector | Template config] ***************************************************************************************************************************************************************************************************
+task path: /root/08-ansible-02-playbook-1/playbook/site.yml:70
+ok: [vector-01] => {"changed": false, "checksum": "73809b9097ffb445e1bb79b309365cb082a109d9", "dest": "/root/vector_config//vector.yml", "gid": 0, "group": "root", "mode": "0644", "owner": "root", "path": "/root/vector_config//vector.yml", "secontext": "system_u:object_r:admin_home_t:s0", "size": 13, "state": "file", "uid": 0}
+
+TASK [Configure Service | Template systemd unit] ********************************************************************************************************************************************************************************************
+task path: /root/08-ansible-02-playbook-1/playbook/site.yml:76
+ok: [vector-01] => {"changed": false, "checksum": "ab51618d25f807192bbde7598341b6ed9df09847", "dest": "/etc/systemd/system/vector.service", "gid": 0, "group": "root", "mode": "0644", "owner": "root", "path": "/etc/systemd/system/vector.service", "secontext": "system_u:object_r:systemd_unit_file_t:s0", "size": 249, "state": "file", "uid": 0}
+META: ran handlers
+META: ran handlers
+
+PLAY RECAP **********************************************************************************************************************************************************************************************************************************
+clickhouse-01              : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=1    ignored=0
+vector-01                  : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
 9. Подготовьте README.md файл по своему playbook. В нём должно быть описано: что делает playbook, какие у него есть параметры и теги.
-10. Готовый playbook выложите в свой репозиторий, поставьте тег `08-ansible-02-playbook` на фиксирующий коммит, в ответ предоставьте ссылку на него.
+Сделано  
+
+10. Готовый playbook выложите в свой репозиторий, поставьте тег `08-ansible-02-playbook` на фиксирующий коммит, в ответ предоставьте ссылку на него.  
+https://github.com/aleks-sh-devops/08-ansible-02-playbook
